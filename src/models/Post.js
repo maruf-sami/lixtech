@@ -38,20 +38,20 @@ const PostSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      index: true,
+      // index: true সরানো হয়েছে (কারণ এটি নিচের কম্পাউন্ড ইনডেক্সের প্রিফিক্স)
     },
 
     status: {
       type: String,
       enum: ["DRAFT", "PUBLISHED"],
       default: "DRAFT",
-      index: true,
+      // index: true সরানো হয়েছে
     },
 
     publishedAt: {
       type: Date,
       default: null,
-      index: true,
+      index: true, // এটি থাকবে, কারণ standalone publishedAt কুয়েরি হতে পারে
     },
 
     tags: [
@@ -79,12 +79,16 @@ const PostSchema = new mongoose.Schema(
 |--------------------------------------------------------------------------
 */
 
+// Homepage Feed (পাবলিশড ডেট অনুযায়ী সর্টিং)
 PostSchema.index({ status: 1, publishedAt: -1 });
 
+// Author Profile Page (লেখকের পাবলিশড পোস্টগুলো লেটেস্ট ডেট অনুযায়ী দেখাবে)
 PostSchema.index({ authorId: 1, status: 1, publishedAt: -1 });
 
+// Tag Search
 PostSchema.index({ tags: 1 });
 
+// Full-Text Search
 PostSchema.index({
   title: "text",
   excerpt: "text",
