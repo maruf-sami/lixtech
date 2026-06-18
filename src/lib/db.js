@@ -32,6 +32,7 @@ export async function dbConnect() {
           "development",
       }
     );
+    console.log("mongodb connectied")
   }
 
   cached.conn =
