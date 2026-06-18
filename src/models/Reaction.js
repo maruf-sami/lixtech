@@ -23,6 +23,15 @@ const ReactionSchema = new mongoose.Schema(
       type: String,
       enum: ["LIKE", "LOVE", "HAHA", "WOW", "SAD", "ANGRY"],
       default: "LIKE",
+      validate: {
+        validator: function (value) {
+          if (this.targetType === "POST" && value !== "LIKE") {
+            return false; 
+          }
+          return true;
+        },
+        message: "Posts can only have 'LIKE' reactions. Multiple reactions are reserved for comments only.",
+      },
     },
   },
   {
@@ -31,23 +40,8 @@ const ReactionSchema = new mongoose.Schema(
   }
 );
 
+ReactionSchema.index({ targetId: 1, targetType: 1, userId: 1 }, { unique: true });
+ReactionSchema.index({ userId: 1, createdAt: -1 });
 
-ReactionSchema.index(
-  {
-    targetId: 1,
-    targetType: 1,
-    userId: 1,
-  },
-  {
-    unique: true,
-  }
-);
-ReactionSchema.index({
-  userId: 1,
-  createdAt: -1,
-});
-
-const Reaction =
-  mongoose.models.Reaction || mongoose.model("Reaction", ReactionSchema);
-
+const Reaction = mongoose.models.Reaction || mongoose.model("Reaction", ReactionSchema);
 export default Reaction;
